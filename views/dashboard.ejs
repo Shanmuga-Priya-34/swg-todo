@@ -1,14 +1,129 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6f9;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .dashboard-container {
+            width: 450px;
+            background: white;
+            padding: 40px;
+            border-radius: 14px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 25px;
+            color: #333;
+        }
+
+        .stats {
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: #f9fafc;
+            border: 1px solid #eee;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 10px;
+            font-size: 18px;
+            color: #444;
+        }
+
+        .stat-card strong {
+            color: #4a90e2;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .actions a {
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .todo-btn {
+            background: #4a90e2;
+        }
+
+        .todo-btn:hover {
+            background: #357abd;
+        }
+
+        .logout-btn {
+            background: #dc3545;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+        }
+    </style>
 </head>
+
 <body>
-    <h1>Welcome, <%= username %></h1>
-    <p>Total tasks: <%= total %></p>
-    <p>Completed: <%= completed %></p>
-    <p>Pending: <%= pending %></p>
-    <a href="/todo">Go to To-Do List</a><br>
-    <a href="/logout">Logout</a>
+
+    <div class="dashboard-container">
+
+        <h1>Welcome, <%= username %></h1>
+
+        <div class="stats">
+
+            <div class="stat-card">
+                Total Tasks:
+                <strong><%= total %></strong>
+            </div>
+
+            <div class="stat-card">
+                Completed Tasks:
+                <strong><%= completed %></strong>
+            </div>
+
+            <div class="stat-card">
+                Pending Tasks:
+                <strong><%= pending %></strong>
+            </div>
+
+        </div>
+
+        <div class="actions">
+
+            <a href="/todo" class="todo-btn">
+                Go to To-Do List
+            </a>
+
+            <a href="/logout" class="logout-btn">
+                Logout
+            </a>
+
+        </div>
+
+    </div>
+
 </body>
 </html>

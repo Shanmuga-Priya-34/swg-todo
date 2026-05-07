@@ -1,32 +1,241 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>To-Do List</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6f9;
+            padding: 40px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: auto;
+            background: white;
+            padding: 35px;
+            border-radius: 14px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .task-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .task-form input[type="text"] {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .task-form input[type="text"]:focus {
+            border-color: #4a90e2;
+            box-shadow: 0 0 5px rgba(74, 144, 226, 0.4);
+        }
+
+        .task-form button {
+            padding: 12px 18px;
+            border: none;
+            background: #4a90e2;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .task-form button:hover {
+            background: #357abd;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        li {
+            background: #fafafa;
+            border: 1px solid #eee;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .task-content {
+            flex: 1;
+            margin-left: 12px;
+            color: #333;
+        }
+
+        .completed {
+            text-decoration: line-through;
+            color: gray;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .actions button {
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .complete-btn {
+            background: #28a745;
+            color: white;
+        }
+
+        .complete-btn:hover {
+            background: #218838;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #c82333;
+        }
+
+        .links {
+            margin-top: 25px;
+            text-align: center;
+        }
+
+        .links a {
+            text-decoration: none;
+            color: #4a90e2;
+            margin: 0 10px;
+            font-weight: bold;
+        }
+
+        .links a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
+
 <body>
-    <h1><%= username %>'s To-Do List</h1>
-    <form method="POST" action="/todo">
-        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-        <input type="text" name="content" placeholder="New Task" required>
-        <button type="submit">Add</button>
-    </form>
-    <ul>
-    <% tasks.forEach(task => { %>
-        <li>
-            <form method="POST" action="/task/<%= task.id %>/toggle" class="toggle-task-form" style="display:inline;">
-                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                <button type="submit"><%= task.completed ? "Undo" : "Complete" %></button>
-            </form>
-            <%= task.content %> (<%= task.completed ? "Done" : "Pending" %>)
-            <form method="POST" action="/task/<%= task.id %>/delete" class="delete-task-form" style="display:inline;">
-                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                <button type="submit">Delete</button>
-            </form>
-        </li>
-    <% }) %>
-    </ul>
-    <a href="/dashboard">Back to Dashboard</a><br>
-    <a href="/logout">Logout</a>
+
+    <div class="container">
+
+        <h1><%= username %>'s To-Do List</h1>
+
+        <form method="POST" action="/todo" class="task-form">
+
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+            <input 
+                type="text" 
+                name="content" 
+                placeholder="Enter a new task..." 
+                required
+            >
+
+            <button type="submit">Add Task</button>
+
+        </form>
+
+        <ul>
+
+        <% tasks.forEach(task => { %>
+
+            <li>
+
+                <div class="task-content <%= task.completed ? 'completed' : '' %>">
+                    <strong><%= task.content %></strong>
+                    —
+                    <%= task.completed ? "Completed" : "Pending" %>
+                </div>
+
+                <div class="actions">
+
+                    <form 
+                        method="POST" 
+                        action="/task/<%= task.id %>/toggle"
+                        style="display:inline;"
+                    >
+
+                        <input 
+                            type="hidden" 
+                            name="_csrf" 
+                            value="<%= csrfToken %>"
+                        >
+
+                        <button 
+                            type="submit"
+                            class="complete-btn"
+                        >
+                            <%= task.completed ? "Undo" : "Complete" %>
+                        </button>
+
+                    </form>
+
+                    <form 
+                        method="POST" 
+                        action="/task/<%= task.id %>/delete"
+                        style="display:inline;"
+                    >
+
+                        <input 
+                            type="hidden" 
+                            name="_csrf" 
+                            value="<%= csrfToken %>"
+                        >
+
+                        <button 
+                            type="submit"
+                            class="delete-btn"
+                        >
+                            Delete
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </li>
+
+        <% }) %>
+
+        </ul>
+
+        <div class="links">
+            <a href="/dashboard">Dashboard</a>
+            |
+            <a href="/logout">Logout</a>
+        </div>
+
+    </div>
+
     <script src="/script.js"></script>
+
 </body>
 </html>
