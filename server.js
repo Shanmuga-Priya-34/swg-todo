@@ -84,7 +84,31 @@ app.set("views", path.join(__dirname, "views"));
 
 app.use(express.static(path.join(__dirname, "public")));
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(helmet());
+app.use(
+    helmet({
+        contentSecurityPolicy: {
+            directives: {
+                defaultSrc: ["'self'"],
+
+                scriptSrc: [
+                    "'self'",
+                    "'unsafe-inline'",
+                    "https://cdn.jsdelivr.net"
+                ],
+
+                styleSrc: [
+                    "'self'",
+                    "'unsafe-inline'"
+                ],
+
+                imgSrc: [
+                    "'self'",
+                    "data:"
+                ]
+            }
+        }
+    })
+);
 
 app.use(session({
 
@@ -702,7 +726,7 @@ app.get("/admin",
                         ).length;
 
                         const successfulLogins = logs.filter(log =>
-                            log.action.includes("Login Success")
+                            log.action.includes("MFA Verification Success")
                         ).length;
 
                         const totalUsers = users.length;
@@ -719,25 +743,54 @@ app.get("/admin",
                             log.action.includes("Toggled Task ID")
                         ).length;
 
-                        const pendingTasks = totalTasks - completedTasks;
+                        const pendingTasks =
+                            totalTasks - completedTasks;
 
                         const unauthorizedAttempts = logs.filter(log =>
                             log.action.includes("Unauthorized")
                         ).length;
 
+                        // -----------------------------
+                        // ANOMALY DETECTION
+                        // -----------------------------
+
+                        const suspiciousFailedLogins = logs.filter(log =>
+                            log.action.includes("Login Failed")
+                        ).length;
+
+                        const suspiciousOtpFailures = logs.filter(log =>
+                            log.action.includes("Invalid OTP")
+                        ).length;
+
+                        const suspiciousUsers = logs.filter(log =>
+                            log.action.includes("Login Failed") ||
+                            log.action.includes("Invalid OTP")
+                        );
+
                         res.render("admin", {
+
                             username: req.session.username,
+
                             users,
                             logs,
+
                             otpFailures,
                             failedLogins,
                             successfulLogins,
+
                             totalUsers,
                             totalAdmins,
+
                             totalTasks,
                             completedTasks,
                             pendingTasks,
-                            unauthorizedAttempts
+
+                            unauthorizedAttempts,
+
+                            suspiciousFailedLogins,
+                            suspiciousOtpFailures,
+                            suspiciousUsers
+
                         });
 
                     }

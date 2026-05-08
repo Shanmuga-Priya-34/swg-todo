@@ -90,15 +90,8 @@
             border-radius:18px;
             box-shadow:0 4px 15px rgba(0,0,0,0.08);
             margin-bottom:35px;
-        }
-
-        .chart-wrapper h2{
-            margin-bottom:20px;
-        }
-
-        #taskChart{
-            width:100% !important;
-            height:400px !important;
+            height:500px;
+            position:relative;
         }
 
         .logs{
@@ -107,6 +100,7 @@
             border-radius:18px;
             box-shadow:0 4px 15px rgba(0,0,0,0.08);
             overflow-x:auto;
+            margin-top:35px;
         }
 
         .logs h2{
@@ -208,6 +202,21 @@
             <p><%= unauthorizedAttempts %></p>
         </div>
 
+        <div class="card">
+            <h2>Multiple Failed Logins</h2>
+            <p><%= suspiciousFailedLogins %></p>
+        </div>
+
+        <div class="card">
+            <h2>Repeated OTP Failures</h2>
+            <p><%= suspiciousOtpFailures %></p>
+        </div>
+
+        <div class="card">
+            <h2>Potential Threat Users</h2>
+            <p><%= suspiciousUsers.length %></p>
+        </div>
+
     </div>
 
     <div class="chart-wrapper">
@@ -271,57 +280,128 @@
 
     </div>
 
+    <div class="logs">
+
+        <h2>Anomaly Detection Alerts</h2>
+
+        <table>
+
+            <tr>
+                <th>Username</th>
+                <th>Threat Level</th>
+                <th>Reason</th>
+            </tr>
+
+            <% suspiciousUsers.forEach(user => { %>
+
+                <tr>
+
+                    <td>
+                        <%= user.username %>
+                    </td>
+
+                    <td class="danger">
+                        HIGH
+                    </td>
+
+                    <td>
+                        Multiple failed logins or repeated OTP failures detected
+                    </td>
+
+                </tr>
+
+            <% }) %>
+
+        </table>
+
+    </div>
+
 <script>
 
-const ctx = document.getElementById("taskChart");
+document.addEventListener("DOMContentLoaded", () => {
 
-new Chart(ctx, {
+    const completed = Number("<%= completedTasks %>");
+    const pending = Number("<%= pendingTasks %>");
+    const failed = Number("<%= failedLogins %>");
+    const otp = Number("<%= otpFailures %>");
+    const unauthorized = Number("<%= unauthorizedAttempts %>");
 
-    type: "bar",
+    const suspiciousLogins =
+        Number("<%= suspiciousFailedLogins %>");
 
-    data: {
+    const suspiciousOtp =
+        Number("<%= suspiciousOtpFailures %>");
 
-        labels: [
-            "Completed Tasks",
-            "Pending Tasks",
-            "Failed Logins",
-            "OTP Failures",
-            "Unauthorized Attempts"
-        ],
+    const canvas = document.getElementById("taskChart");
 
-        datasets: [{
+    if (!canvas) {
+        console.log("Canvas not found");
+        return;
+    }
 
-            label: "Admin Analytics",
+    const ctx = canvas.getContext("2d");
 
-            data: [
-                <%= completedTasks %>,
-                <%= pendingTasks %>,
-                <%= failedLogins %>,
-                <%= otpFailures %>,
-                <%= unauthorizedAttempts %>
+    new Chart(ctx, {
+
+        type: "bar",
+
+        data: {
+
+            labels: [
+                "Completed Tasks",
+                "Pending Tasks",
+                "Failed Logins",
+                "OTP Failures",
+                "Unauthorized Attempts",
+                "Suspicious Logins",
+                "OTP Threats"
             ],
 
-            borderWidth: 1
+            datasets: [{
 
-        }]
+                label: "Admin Analytics",
 
-    },
+                data: [
+                    completed,
+                    pending,
+                    failed,
+                    otp,
+                    unauthorized,
+                    suspiciousLogins,
+                    suspiciousOtp
+                ],
 
-    options: {
+                backgroundColor: [
+                    "#28a745",
+                    "#ffc107",
+                    "#dc3545",
+                    "#ff9800",
+                    "#6c757d",
+                    "#b71c1c",
+                    "#ff5722"
+                ],
 
-        responsive: true,
+                borderWidth: 1
 
-        maintainAspectRatio: false,
+            }]
 
-        scales: {
+        },
 
-            y: {
-                beginAtZero: true
+        options: {
+
+            responsive: true,
+
+            maintainAspectRatio: false,
+
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
             }
 
         }
 
-    }
+    });
 
 });
 
