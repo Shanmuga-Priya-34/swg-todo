@@ -1,6 +1,7 @@
 const express = require("express");
 require("dotenv").config();
-
+const https = require("https");
+const fs = require("fs");
 const nodemailer = require("nodemailer");
 const session = require("express-session");
 const bcrypt = require("bcrypt");
@@ -125,7 +126,7 @@ app.use(session({
 
     cookie: {
         httpOnly: true,
-        secure: false,
+        secure: true,
         sameSite: "strict",
         maxAge: 1000 * 60 * 60
     }
@@ -139,7 +140,7 @@ app.use(csrfProtection);
 const loginLimiter = rateLimit({
 
     windowMs: 15 * 60 * 1000,
-    max: 100,
+    max: 10,
     message: "Too many login attempts. Please try again later."
 
 });
@@ -818,8 +819,10 @@ app.use((err, req, res, next) => {
 
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
 
-    console.log(`Server running at http://localhost:${PORT}`);
+    console.log(
+        `Server running at http://localhost:${PORT}`
+    );
 
 });
